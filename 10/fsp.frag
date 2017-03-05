@@ -28,7 +28,7 @@ float sdHexagonal(vec3 p)
     // Hexagonalの距離関数
     // float radio = 1.0;
     // float hight = 2.0;
-    // return max(abs(p.z)-hight,max(abs(p.x)*sin(1.04)+abs(p.y)*sin(0.57),abs(p.y))-radio);
+    // return max(abs(p.z)-hight,max(abs(p.x)*sin(1.04)+abs(p.y)*sin(0.52),abs(p.y))-radio);
 
     // Hexagonalの距離関数
     vec3 q = abs(p);
