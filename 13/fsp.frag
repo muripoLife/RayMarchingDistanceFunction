@@ -19,52 +19,51 @@ float sdCapsule(vec3 p)
     // p = m_y * p;
     // mat3 m_z = mat3(cos(time),-sin(time),0,sin(time),cos(time),0,0,0,1);
     // p = m_z * p;
-    // mat3 m_x = mat3(1,0,0,0,cos(1.57),-sin(1.57),0,sin(1.57),cos(1.57));
-    // p = m_x * p;
 
     vec3 a  = vec3(0.75, 0.0, 1.0);
     vec3 b  = vec3(-0.75, 0.0, 1.0);
-    float r = 1.0;
-
+    float r = 2.0;
     vec3 pa = p - a, ba = b - a;
 
     /* 元の距離関数 */
     // ipr:inner product rate
+    float ipr = dot(pa,ba)/dot(ba,ba);
+    float h   = clamp(ipr, 0.0, 1.0);
+    return length( pa - ba*h ) - r;
+
+    /* 外積の大きさをかませてみる */
+    // cpr:cross product rate
+    // float cpr = length(cross(pa,ba))/length(cross(ba,ba));
+    // float tmp = cpr;
+    // float h   = clamp(tmp, 0.0, 1.0);
+    // return length( pa - ba*h ) - r;
+
+		/* アニメーション01(内積っぽいものをかませてみる) */
+    // float ipr = length(pa)/length(ba)*abs(cos(time));
+    // float tmp = cpr;
+    // float h   = clamp(tmp, 0.0, 1.0);
+    // return length( pa - ba*h ) - r;
+
+    /* アニメーション02 */
     // float ipr = dot(pa,ba)/dot(ba,ba);
     // float h   = clamp(ipr, 0.0, 1.0);
-    // return length( pa - ba*h ) - r;
+    // return length( pa - ba*h*sin(time) ) - r;
 
-    /* アニメーション */
-    float ipr = dot(pa,ba)/dot(ba,ba);
-    float cpr = length(cross(pa,ba))/length(cross(ba,ba));
+    /* アニメーション03_cupsule→shpere */
+    // float ipr = dot(pa,ba)/dot(ba,ba);
+    // float h   = clamp(ipr, 0.0, 1.0);
+    // return (length(pa - ba*h))*abs(cos(time))+(length(p))*abs(sin(time)) - r;
 
-    float tmp = ipr;
-    float h   = clamp(tmp, 0.0, 1.0);
-    vec3 v    = pa - ba*h;
-    return v.x+v.y+v.z-r;
-    // return length( pa - ba*h ) - r;
-
-		/* アニメーション */
-		// float ipr = dot(pa,ba)/dot(ba,ba);
-    // float h   = clamp(sin(ipr+time), 0.0, 1.0);
-    // return length( pa - ba*h ) - r;
-
-
-    /* 距離関数1 */
-    // vec3 pa = p - a, ba = b - a;
-    // float h = min(max( dot(pa,ba)/dot(ba,ba), 0.0), 1.0);
-    // return sqrt((p.x-h*ba.x)*(p.x-h*ba.x)+(p.y-h*ba.y)*(p.y-h*ba.y)+(p.z-h*ba.z)*(p.z-h*ba.z))- r;
-
-    /* 距離関数2 */
-    // vec3 pa = p - a, ba = b - a;
+    /* アニメーション04 */
     // float d = dot(pa,ba)/dot(ba,ba);
     // if(d < 0.0){
     //     return length(pa) - r;
     // } else if(d > 1.0){
     //     return length( pa - ba ) - r;
+    // } else if(d == 0.5){
+    //     return length(pa*sin(time)*2.0) - r;
     // }
     // return length( pa - ba * d ) - r;
-
 }
 
 // 距離関数を呼び出すハブ関数
