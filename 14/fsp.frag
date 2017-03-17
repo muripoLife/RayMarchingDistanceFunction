@@ -15,6 +15,7 @@ float sdCappedCylinder(vec3 p)
 {
     // 回転
     // mat3 m_x = mat3(1,0,0,0,cos(time),-sin(time),0,sin(time),cos(time));
+    // mat3 m_x = mat3(1,0,0,0,cos(0.3),-sin(0.3),0,sin(0.3),cos(0.3));
     // p = m_x * p;
     // mat3 m_y = mat3(cos(time),0,-sin(time),0,1,0,sin(time),0,cos(time));
     // p = m_y * p;
@@ -31,6 +32,12 @@ float sdCappedCylinder(vec3 p)
     // float height = 1.0;
     // return sqrt((max(sqrt(p.x*p.x+p.z*p.z)-r, 0.0))*(max(sqrt(p.x*p.x+p.z*p.z)-r, 0.0))+(max(abs(p.y)-height,0.0)*(max(abs(p.y)-height,0.0))));
 
+    /* lengthを使用しない抜きの表記 */
+    // vec2 h = vec2(1.0, 1.0);
+    // vec2 d = abs(vec2(length(p.xz),p.y)) - h;
+    // return min(max(d.x,d.y),0.0) + max(max(d.x,0.0),max(d.y,0.0));
+
+
     /* 三角錐二つ */
     // vec2 h = vec2(1.0, 1.0);
     // vec2 d = abs(vec2(sqrt(p.x*p.x+p.z*p.z),p.y)) - h;
@@ -39,7 +46,7 @@ float sdCappedCylinder(vec3 p)
     /* コマ */
     // vec2 h = vec2(1.0, 1.0);
     // vec2 d = abs(vec2(sqrt(p.x*p.x+p.z*p.z),p.y)) - h;
-    // return min(min(d.x,d.y),0.0) + length(max(d,0.3));;
+    // return min(min(d.x,d.y),0.0) + length(max(d,0.3));
 
     /* コマ(変形) */
     // vec2 h = vec2(1.0, 1.0);
@@ -52,7 +59,6 @@ float sdCappedCylinder(vec3 p)
     // vec2 h = vec2(1.0, 1.0);
     // vec2 d = abs(vec2(sqrt(p.x*p.x+p.z*p.z),p.y)) - h;
     // return min(min(d.x,d.y),0.0) + length(max(d,0.3));
-
 
     /* メタリックぽい? */
     // mat3 m_x = mat3(1,0,0,0,cos(time),-sin(time),0,sin(time),cos(time));
