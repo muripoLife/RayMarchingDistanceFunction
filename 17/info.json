@@ -1,6 +1,6 @@
 {
-    "title": "color hub function",
+    "title": "Capped Cone Tdistance function",
     "version": "0.0.1",
     "author": "ogi",
-    "description": "図形ごとに色を変える"
+    "description": "Capped Coneの距離関数を定義する"
 }
