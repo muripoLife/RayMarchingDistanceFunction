@@ -55,12 +55,13 @@ float udTriangle( vec3 p, vec3 a, vec3 b, vec3 c )
 	);
 }
 
-float udPlay( vec3 p, vec3 a, vec3 b, vec3 c, vec3 d, vec3 e )
+
+float udPentagon( vec3 p, vec3 a, vec3 b, vec3 c, vec3 d, vec3 e )
 {
 	vec3 ba = b - a; vec3 pa = p - a;
 	vec3 cb = c - b; vec3 pb = p - b;
 	vec3 dc = d - c; vec3 pc = p - c;
-	vec3 ad = a - d; vec3 pd = p - d;
+	vec3 ad = e - d; vec3 pd = p - d;
 	vec3 ae = a - e; vec3 pe = p - e;
 	vec3 nor = cross( ba, ad );
 
@@ -88,31 +89,43 @@ float udTriangleToQuad(in vec3 p)
     // return udQuad(p, vec3(-1.0*sin(time), 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0),vec3(-1.0, -1.0, 1.0));
     // return udQuad(p, vec3(-1.0*abs(cos(time)), 1.0*abs(sin(time)), 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0),vec3(-1.0, -1.0, 1.0));
     // return udQuad(p, vec3(-1.0*abs(cos(time)), 1.0*abs(sin(time)), 1.0), vec3(1.0*abs(cos(time)), 1.0, 1.0), vec3(1.0, -1.0, 1.0),vec3(-1.0, -1.0, 1.0));
-    // return udQuad(p, vec3(-1.0*abs(sin(time)), 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0*sin(time), -1.0, 1.0),vec3(-1.0, -1.0, 1.0));
-	return udQuad(p, vec3(-1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0),vec3(-1.0, -1.0, 1.0) )*abs(sin(time*0.7))+udTriangle(p, vec3(1.0, 1.0, 1.0), vec3(-1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0) )*(1.0-abs(sin(time*0.7)));
+    return udQuad(p, vec3(-1.0*abs(sin(time)), 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0*sin(time), -1.0, 1.0),vec3(-1.0, -1.0, 1.0));
+    // return udQuad(p, vec3(-1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0),vec3(-1.0, -1.0, 1.0) )*abs(sin(time*0.7))+udTriangle(p, vec3(1.0, 1.0, 1.0), vec3(-1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0) )*(1.0-abs(sin(time*0.7)));
     // return udQuad(p, vec3(-1.0*abs(mod(sin(time), 0.4)), 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0),vec3(-1.0, -1.0, 1.0));
-    
 }
 
 
+float udInstancePentagon(in vec3 p)
+{
+    // p = mat3(1.0,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time) )*p;
+    // p = mat3(cos(time),0,-sin(time), 0,1,0, sin(time),0,cos(time))*p;
+    // p = mat3(cos(time),-sin(time),0, sin(time), cos(time),0 ,0,0,1)*p;
+    return udPentagon(p,vec3(1.0, 0.0, 1.0), vec3(0.3090169943749474241023, 0.9510565162951535721164, 1.0), vec3(-0.8090169943749474241023, 0.5877852522924731291687, 1.0), vec3(-0.8090169943749474241023, -0.5877852522924731291687, 1.0), vec3(0.3090169943749474241023, -0.9510565162951535721164, 1.0));
+}
+
+float pentagonToSphere(in vec3 p)
+{
+    p = mat3(cos(time),-sin(time),0, sin(time), cos(time),0 ,0,0,1)*p;
+    return (length(p)-1.5)*abs(sin(time))+udPentagon(p,vec3(1.0, 0.0, 1.0), vec3(0.3090169943749474241023, 0.9510565162951535721164, 1.0), vec3(-0.8090169943749474241023, 0.5877852522924731291687, 1.0), vec3(-0.8090169943749474241023, -0.5877852522924731291687, 1.0), vec3(0.3090169943749474241023, -0.9510565162951535721164, 1.0))*(1.0-abs(sin(time)));
+}
 
 
 float udInstanceQuad(in vec3 p)
 {
-// 	p = mat3(1.0,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time) )*p;
-// 	p = mat3(cos(time),0,-sin(time), 0,1,0, sin(time),0,cos(time))*p;
-// 	p = mat3(cos(time),-sin(time),0, sin(time), cos(time),0 ,0,0,1)*p;
-    return udQuad(p, vec3(-1.0, 1.0, 1.0), vec3(pow(1.0, sin(time)), 1.0, 1.0), vec3(1.0*sin(time), -1.0, 1.0),vec3(-1.0, -1.0, 1.0));
-// 	return udQuad(p, vec3(0.0, 0.5, 1.0), vec3(0.2, 0.8, 0.5), vec3(0.9, 0.3, 0.4),vec3(0.7, 0.1, 0.6) );
-// 	return udQuad(p, vec3(-1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0),vec3(-1.0, -1.0, 1.0) );
-    // return udTriangle(p, vec3(1.0, 1.0, 1.0), vec3(-1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0) );
-// 	return udQuad(p, vec3(-1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0),vec3(-1.0, -1.0, 1.0) )*abs(sin(time*0.7))+udTriangle(p, vec3(1.0, 1.0, 1.0), vec3(-1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0) )*(1.0-abs(sin(time*0.7)));
+    // p = mat3(1.0,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time) )*p;
+    // p = mat3(cos(time),0,-sin(time), 0,1,0, sin(time),0,cos(time))*p;
+    // p = mat3(cos(time),-sin(time),0, sin(time), cos(time),0 ,0,0,1)*p;
+    return udQuad(p, vec3(-1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0, -1.0, 1.0),vec3(-1.0, -1.0, 1.0) );
+
 }
+
 
 float distanceHub(vec3 p){
 	// 0.4を書けて、rayの進行を遅らせている
-	return udInstanceQuad(p)*0.3;
-// 	return udTriangleToQuad(p)*0.3;
+// 	return udInstanceQuad(p)*0.3;
+// 	return pentagonToSphere(p)*0.3;
+// 	return udInstancePentagon(p)*0.3;
+	return udTriangleToQuad(p)*0.3;
 }
 
 // 法線
@@ -129,12 +142,30 @@ vec3 genNormal(vec3 p){
 // 図形ごとに色をわける
 vec3 doColor(vec3 p){
 	float e = 0.001;
-	if (udInstanceQuad(p)<e){
+// 	if (udInstanceQuad(p)<e){
+// 		vec3 normal = genNormal(p);
+// 		vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
+// 		float diff  = max(dot(normal, light), 0.1);
+// 		return vec3(diff, diff, diff);
+// 	}
+	if (udTriangleToQuad(p)<e){
 		vec3 normal = genNormal(p);
 		vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
 		float diff  = max(dot(normal, light), 0.1);
 		return vec3(diff, diff, diff);
 	}
+// 	if (udInstancePentagon(p)<e){
+// 		vec3 normal = genNormal(p);
+// 		vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
+// 		float diff  = max(dot(normal, light), 0.1);
+// 		return vec3(diff, diff, diff);
+// 	}
+// 	if (pentagonToSphere(p)<e){
+// 		vec3 normal = genNormal(p);
+// 		vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
+// 		float diff  = max(dot(normal, light), 0.1);
+// 		return vec3(diff*abs(cos(time)*cos(time/2.0)), diff*abs(cos(time)*sin(time/2.0)), diff*abs(sin(time)));
+// 	}
 	return vec3(0.0);
 }
 
