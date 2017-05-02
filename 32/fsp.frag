@@ -46,12 +46,27 @@ float X(vec2 p){float d=1.0;d=min(d,line(p,vec2(1,1.5),vec2(5,8)));d=min(d,line(
 float Y(vec2 p){float d=1.0;d=min(d,line(p,vec2(1,1.5),vec2(3,5)));d=min(d,line(p,vec2(3,5),vec2(3,8)));d=min(d,line(p,vec2(3,8),vec2(3,5)));d=min(d,line(p,vec2(3,5),vec2(5,1.5)));return d;}
 float Z(vec2 p){float d=1.0;d=min(d,line(p,vec2(1,1.5),vec2(5,1.5)));d=min(d,line(p,vec2(5,1.5),vec2(3,5)));d=min(d,line(p,vec2(3,5),vec2(1.5,5)));d=min(d,line(p,vec2(1.5,5),vec2(4.5,5)));d=min(d,line(p,vec2(4.5,5),vec2(3,5)));d=min(d,line(p,vec2(3,5),vec2(1,8)));d=min(d,line(p,vec2(1,8),vec2(5,8)));return d;}
 
+float one(vec2 p){float d=1.0;d=min(d,line(p,vec2(2.0,2.0),vec2(3.0,1.5)));d=min(d,line(p,vec2(3,1.5),vec2(3,8)));d=min(d,line(p,vec2(3,8),vec2(1.5,8)));d=min(d,line(p,vec2(1.5,8),vec2(4.5,8)));return d;}
+float two(vec2 p){float d=1.0;d=min(d,line(p,vec2(1,1.5),vec2(5,1.5)));d=min(d,line(p,vec2(1,4.5),vec2(5,4.5)));d=min(d,line(p,vec2(5,1.5),vec2(5,3.5)));d=min(d,line(p,vec2(1,5.5),vec2(1,7.5)));d=min(d,line(p,vec2(1,8),vec2(5,8)));return d;}
+float three(vec2 p){float d=1.0;d=min(d,line(p,vec2(1,1.5),vec2(5,1.5)));d=min(d,line(p,vec2(1,4.5),vec2(5,4.5)));d=min(d,line(p,vec2(5,1.5),vec2(5,3.5)));d=min(d,line(p,vec2(5,5.5),vec2(5,7.5)));d=min(d,line(p,vec2(1,8),vec2(5,8)));return d;}
+float four(vec2 p){float d=1.0;d=min(d,line(p,vec2(1,4.5),vec2(5,4.5)));d=min(d,line(p,vec2(1,1.5),vec2(1,3.5)));d=min(d,line(p,vec2(5,1.5),vec2(5,3.5)));d=min(d,line(p,vec2(5,5.5),vec2(5,7.5)));return d;}
+float five(vec2 p){float d=1.0;d=min(d,line(p,vec2(5,1.5),vec2(1,1.5)));d=min(d,line(p,vec2(1,1.5),vec2(1,5)));d=min(d,line(p,vec2(1,5),vec2(5,5)));d=min(d,line(p,vec2(5,5),vec2(5,8)));d=min(d,line(p,vec2(5,8),vec2(1,8)));return d;}
+
+
 float plus(vec2 p){float d=1.0;d=min(d,line(p,vec2(0,5),vec2(4,5)));d=min(d,line(p,vec2(2,3),vec2(2,7)));return d;}
 float minus(vec2 p){float d=1.0;d=min(d,line(p,vec2(0.0,5.0),vec2(7.0,5.0)));return d;}
 float product(vec2 p){float d=1.0;d=min(d,line(p,vec2(4.0,5.0),vec2(4.5,5.0)));return d;}
 float devided(vec2 p){float d=1.0;d=min(d,line(p,vec2(5,1.5),vec2(2,8)));return d;}
 float equals(vec2 p){float d=1.0;d=min(d,line(p,vec2(1,3),vec2(5,3)));d=min(d,line(p,vec2(1,6),vec2(5,6)));return d;}
 
+float two(vec2 p){
+	float d=1.0;
+	d=min(d,line(p,vec2(2.0,2.0),vec2(3.0,1.5)));
+	d=min(d,line(p,vec2(3,1.5),vec2(3,8)));
+	d=min(d,line(p,vec2(3,8),vec2(1.5,8)));
+	d=min(d,line(p,vec2(1.5,8),vec2(4.5,8)));
+	return d;
+}
 
 float distanceCharacter(vec3 p)
 {
@@ -59,13 +74,21 @@ float distanceCharacter(vec3 p)
 	float letters  = 1e10;
 	vec3 boundingSize = vec3(30,12,0.8);
 
-	p = mat3(1.0,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time) )*p;
+	// p = mat3(1.0,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time) )*p;
 	// p = mat3(cos(time),0,-sin(time), 0,1,0, sin(time),0,cos(time))*p;
 	// p = mat3(cos(time),-sin(time),0, sin(time), cos(time),0 ,0,0,1)*p;
 
 	// alphabet 追加
-	letters = min(letters, X(vec2(p.x, p.y-1.0)));
-	letters = min(letters, Y(vec2(p.x-1.0, p.y-1.0)));
+	p -= vec3(1.5*sin(time), 0.0, 0.0);
+// 	p -= vec3(1.0, 0.0, 0.0);
+
+	letters = min(letters, minus(vec2(p.x+1.0, p.y-1.0)));
+	letters = min(letters, Y(vec2(p.x, p.y-1.0)));
+	letters = min(letters, X(vec2(p.x+2.0, p.y-1.0)));
+	letters = min(letters, equals(vec2(p.x-1.0, p.y-1.0)));
+	letters = min(letters, one(vec2(p.x-2.0, p.y-1.0)));
+
+
 
 	float bounding = length(max(abs(p)-boundingSize,0.0));
 	letters = max(bounding, letters);
