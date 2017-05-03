@@ -15,7 +15,7 @@ uniform sampler2D prevScene;
 // 図形の距離関数
 float dGraphic(vec3 p){
     // ここに図形の距離関数を書く
-    return sqrt(p.x*p.x+sin(p.y*p.y+time)+p.z*p.z) - 0.5;
+    return sqrt(p.x*p.x+p.y*p.y+p.z*p.z) - 0.5;
 }
 
 // 二つの図形を合成するの距離関数
@@ -65,7 +65,7 @@ void main(){
         // 法線を算出
         vec3 normal  = genNormal(rPos);
         // ライトベクトルの定義（マウスの影響を受けるように）
-        vec3 light   = normalize(vec3(mouse + 1.0, 1.0));
+        vec3 light   = normalize(vec3(1.0));
         // ライトベクトルとの内積を取る
         float diff   = max(dot(normal, light), 0.1);
         // diffuse を出力する
