@@ -1,5 +1,5 @@
 // ============================================================================
-// pyramid distance function
+// Triangle stone distance function
 // ============================================================================
 
 precision mediump float;
@@ -7,6 +7,32 @@ uniform vec2 resolution;
 uniform vec2 mouse;
 uniform float time;
 uniform sampler2D prevScene;
+
+float rnd(vec2 n) {
+    return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+}
+
+float noise(vec2 p){
+    vec2 v = floor(p);
+    vec2 u = fract(p);
+    u = u * u * (3.0 - 2.0 * u);
+    float r = mix(
+        mix(rnd(v), rnd(v + vec2(1.0, 0.0)), u.x),
+        mix(rnd(v + vec2(0.0, 1.0)), rnd(v + vec2(1.0, 1.0)), u.x),
+        u.y
+    );
+    return r * r;
+}
+
+float snoise(vec2 p){
+    float n = 0.0;
+    for(float i = 0.0; i < 4.0; ++i){
+        float v = pow(2.0, 2.0 + i);
+        float w = pow(2.0, -1.0 - i);
+        n += noise(p * v) * w;
+    }
+    return n;
+}
 
 float dot2( in vec3 v ) { return dot(v,v); }
 float udTriangle( vec3 p, vec3 a, vec3 b, vec3 c )
@@ -92,7 +118,7 @@ float udInstanceQuad(in vec3 p)
         ) - 0.01)*0.5;
 }
 
-float sdPyramid(vec3 p){
+float sdTriangleStone(vec3 p){
     // return udInstanceQuad(p);
 
     return min(min(min(min(
@@ -106,9 +132,12 @@ float sdPyramid(vec3 p){
 
 float distanceHub(vec3 p){
     // p = mat3(1.0,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time) )*p;
-    // p = mat3(cos(time),0,-sin(time), 0,1,0, sin(time),0,cos(time))*p;
-    // p = mat3(cos(time),-sin(time),0, sin(time), cos(time),0 ,0,0,1)*p;
-    return sdPyramid(p);
+    p = mat3(cos(time),0,-sin(time), 0,1,0, sin(time),0,cos(time))*p;
+    p = mat3(cos(time),-sin(time),0, sin(time), cos(time),0 ,0,0,1)*p;
+    // return sdTriangleStone(p);
+    return sdTriangleStone(vec3(p.x+snoise(p.xz)*0.1, p.y+snoise(p.xz)*0.1, p.z+snoise(p.xz)*0.1));
+    // return sdTriangleStone(vec3(p.x+noise(p.xz)*0.1, p.y+noise(p.xz)*0.1, p.z+noise(p.xz)*0.1));
+    
 }
 
 vec3 genNormal(vec3 p){
@@ -128,12 +157,12 @@ vec3 doColor(vec3 p){
     // float e = 0.1 + 0.9*abs(sin(time));
     float e = 1.;
 
-    if (sdPyramid(p)<e){
+    if (sdTriangleStone(p)<e){
         vec3 normal = genNormal(p);
         vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
         float diff  = max(dot(normal, light), 0.1);
         float spec = pow(diff*diff, 15.0);
-        return vec3(diff+spec, diff+spec, diff+spec);
+        return vec3(251, 231, 49)*diff/255.0 +vec3(spec);
     }
 
     // if (udInstanceTriangle01(p)<e){
