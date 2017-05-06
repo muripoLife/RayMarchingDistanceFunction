@@ -18,14 +18,27 @@ float dSphere(vec3 p, float r){
     return sqrt(p.x*p.x+p.y*p.y+p.z*p.z) - r;
 }
 
+// 接合部分を滑らかなにする
+float smin( float a, float b, float k )
+{
+    float res = exp( -k*a ) + exp( -k*b );
+    return -log( res )/k;
+}
+
 float instanceSpherer(vec3 p){
     p = mat3(cos(time),-sin(time),0, sin(time),cos(time),0 ,0,0,1)*p;
     p = mat3(1,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time))*p;
     vec3 p1 = vec3(p.x+1.0*sin(time), p.y, p.z);
     vec3 p2 = vec3(p.x-1.0*sin(time), p.y, p.z);
+    vec3 p3 = vec3(p.x+2.0*sin(time), p.y, p.z);
+    vec3 p4 = vec3(p.x-2.0*sin(time), p.y, p.z);
     float spherer01 = dSphere(p1, 1.3+0.3*sin(time));
     float spherer02 = dSphere(p2, 1.3+0.3*cos(time));
-    return min(spherer01, spherer02);
+    float spherer03 = dSphere(p3, 1.3+0.3*cos(time));
+    float spherer04 = dSphere(p4, 1.3+0.3*cos(time));
+    // return smin(spherer01, spherer02, 32.0);
+    // return min(min(min(spherer01, spherer02), spherer03), spherer04);
+    return smin(smin(smin(spherer01, spherer02, 32.0), spherer03, 32.0), spherer03, 32.0);
 }
 
 float distanceHub(vec3 p){
@@ -51,14 +64,9 @@ vec3 doColor(vec3 p){
         vec3 normal  = genNormal(p);
         vec3 light   = normalize(vec3(1.0, 1.0, 1.0));
         float diff   = max(dot(normal, light), 0.1);
-        return vec3(diff*abs(sin(time)), diff*abs(cos(time)), diff);
+        float spec = pow(diff*diff, 15.0);
+        return vec3(diff*0.3+spec, diff+spec, diff+spec);
     }
-    // if (dTorus(p)<e){
-    //     vec3 normal  = genNormal(p);
-    //     vec3 light   = normalize(vec3(1.0, 1.0, 1.0));
-    //     float diff   = max(dot(normal, light), 0.1);
-    //     return vec3(diff*abs(cos(time)), diff*abs(sin(time)), diff);
-    // }
     return vec3(0.0);
 }
 

@@ -32,39 +32,51 @@ float udTriangle( vec3 p, vec3 a, vec3 b, vec3 c )
 
 float udInstanceTriangle01(in vec3 p)
 {
-    return udTriangle(p, vec3(1.0, 1.0, 1.0), vec3(1.0, -1.0, -1.0), vec3(-1.0, 1.0, -1.0))*0.4;
+    return (udTriangle(p,
+        vec3(1.0, 1.0, 1.0),
+        vec3(1.0, -1.0, -1.0),
+        vec3(-1.0, 1.0, -1.0))- 0.01)*0.5;
 }
 float udInstanceTriangle02(in vec3 p)
 {
-    return udTriangle(p, vec3(1.0, -1.0, -1.0), vec3(-1.0, 1.0, -1.0), vec3(-1.0, -1.0, 1.0))*0.4;
+    return (udTriangle(p,
+        vec3(1.0, -1.0, -1.0),
+        vec3(-1.0, 1.0, -1.0),
+        vec3(-1.0, -1.0, 1.0))- 0.01)*0.5;
 }
 float udInstanceTriangle03(in vec3 p)
 {
-    return udTriangle(p, vec3(-1.0, 1.0, -1.0), vec3(-1.0, -1.0, 1.0), vec3(1.0, 1.0, 1.0))*0.4;
+    return (udTriangle(p,
+        vec3(-1.0, 1.0, -1.0),
+        vec3(-1.0, -1.0, 1.0),
+        vec3(1.0, 1.0, 1.0))- 0.01)*0.5;
 }
 float udInstanceTriangle04(in vec3 p)
 {
-    return udTriangle(p, vec3(-1.0, -1.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(1.0, -1.0, -1.0))*0.4;
+    return (udTriangle(p,
+        vec3(-1.0, -1.0, 1.0),
+        vec3(1.0, 1.0, 1.0),
+        vec3(1.0, -1.0, -1.0))- 0.01)*0.5;
+}
+
+float sdRegularTetrahedron(vec3 p){
+    return min(min(min(
+        udInstanceTriangle01(p),
+        udInstanceTriangle02(p)),
+        udInstanceTriangle03(p)),
+        udInstanceTriangle04(p)
+    );
 }
 
 float distanceHub(vec3 p){
-    // p = mat3(1.0,0,0, 0,cos(1.57),-sin(1.57), 0,sin(1.57),cos(1.57) )*p;
-    // p = mat3(1.0,0,0, 0,cos(3.14),-sin(3.14), 0,sin(3.14),cos(3.14) )*p;
-    // p = mat3(cos(3.14),0,-sin(3.14), 0,1,0, sin(3.14),0,cos(3.14))*p;
-    // p = mat3(cos(3.14),-sin(3.14),0, sin(3.14), cos(3.14),0 ,0,0,1)*p;
-    
-    p = mat3(1.0,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time) )*p;
+    // p = mat3(1.0,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time) )*p;
     // p = mat3(cos(time),0,-sin(time), 0,1,0, sin(time),0,cos(time))*p;
     // p = mat3(cos(time),-sin(time),0, sin(time), cos(time),0 ,0,0,1)*p;
-    return min(min(min(udInstanceTriangle01(p), udInstanceTriangle02(p)), udInstanceTriangle03(p)), udInstanceTriangle04(p));
-    // return min(udInstanceTriangle01(p), udInstanceTriangle02(p));
+    return sdRegularTetrahedron(p);
 }
 
 vec3 genNormal(vec3 p){
     float d = 0.001;
-    // float d = 0.01;
-    // float d = 0.1;
-    // float d = 1.;
     return normalize(vec3(
         distanceHub(p + vec3(  d, 0.0, 0.0)) - distanceHub(p + vec3( -d, 0.0, 0.0)),
         distanceHub(p + vec3(0.0,   d, 0.0)) - distanceHub(p + vec3(0.0,  -d, 0.0)),
@@ -76,30 +88,36 @@ vec3 doColor(vec3 p){
     // float e = 0.001;
     // float e = 0.01;
     // float e = 0.1;
+    // float e = 0.5;
+    // float e = 0.1 + 0.9*abs(sin(time));
     float e = 1.;
     if (udInstanceTriangle01(p)<e){
         vec3 normal = genNormal(p);
         vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
         float diff  = max(dot(normal, light), 0.1);
-        return vec3(diff, diff, diff);
+        float spec = pow(diff*diff, 15.0);
+        return vec3(diff*0.3+spec, diff+spec, diff+spec);
     }
     if (udInstanceTriangle02(p)<e){
         vec3 normal = genNormal(p);
         vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
         float diff  = max(dot(normal, light), 0.1);
-        return vec3(diff*0.3, diff, diff);
+        float spec = pow(diff*diff, 15.0);
+        return vec3(diff*0.3+spec, diff+spec, diff+spec);
     }
     if (udInstanceTriangle03(p)<e){
         vec3 normal = genNormal(p);
         vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
         float diff  = max(dot(normal, light), 0.1);
-        return vec3(diff, diff*0.3, diff);
+        float spec = pow(diff*diff, 15.0);
+        return vec3(diff*0.3+spec, diff+spec, diff+spec);
     }
     if (udInstanceTriangle04(p)<e){
         vec3 normal = genNormal(p);
         vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
         float diff  = max(dot(normal, light), 1.0);
-        return vec3(diff, diff, diff*0.3);
+        float spec = pow(diff*diff, 15.0);
+        return vec3(diff*0.3+spec, diff+spec, diff+spec);
     }
     return vec3(0.0);
 }
@@ -117,7 +135,7 @@ void main(){
     float rLen = 0.0;
     vec3 rPos = cPos;
 
-    for(int i = 0; i < 32; ++i){
+    for(int i = 0; i < 64; ++i){
         dist = distanceHub(rPos);
         rLen += dist;
         rPos = cPos + ray * rLen;
