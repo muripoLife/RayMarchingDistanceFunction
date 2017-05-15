@@ -35,41 +35,47 @@ float udInstanceTriangle01(in vec3 p)
     return (udTriangle(p,
         vec3(1.0, 1.0, 1.0),
         vec3(1.0, -1.0, -1.0),
-        vec3(-1.0, 1.0, -1.0))- 0.01)*0.5;
+        vec3(-1.0, 1.0, -1.0))- 0.01);
 }
 float udInstanceTriangle02(in vec3 p)
 {
     return (udTriangle(p,
         vec3(1.0, -1.0, -1.0),
         vec3(-1.0, 1.0, -1.0),
-        vec3(-1.0, -1.0, 1.0))- 0.01)*0.5;
+        vec3(-1.0, -1.0, 1.0))- 0.01);
 }
 float udInstanceTriangle03(in vec3 p)
 {
     return (udTriangle(p,
         vec3(-1.0, 1.0, -1.0),
         vec3(-1.0, -1.0, 1.0),
-        vec3(1.0, 1.0, 1.0))- 0.01)*0.5;
+        vec3(1.0, 1.0, 1.0))- 0.01);
 }
 float udInstanceTriangle04(in vec3 p)
 {
     return (udTriangle(p,
         vec3(-1.0, -1.0, 1.0),
         vec3(1.0, 1.0, 1.0),
-        vec3(1.0, -1.0, -1.0))- 0.01)*0.5;
+        vec3(1.0, -1.0, -1.0))- 0.01);
 }
 
 float sdRegularTetrahedron(vec3 p){
-    return min(min(min(
-        udInstanceTriangle01(p),
-        udInstanceTriangle02(p)),
-        udInstanceTriangle03(p)),
-        udInstanceTriangle04(p)
+    // return min(min(min(
+    //     udInstanceTriangle01(p),
+    //     udInstanceTriangle02(p)),
+    //     udInstanceTriangle03(p)),
+    //     udInstanceTriangle04(p)
+    // );
+    return 
+    min(
+    min(udInstanceTriangle01(p),udInstanceTriangle02(p)),
+    min(udInstanceTriangle03(p),udInstanceTriangle04(p))
     );
+
 }
 
 float distanceHub(vec3 p){
-    // p = mat3(1.0,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time) )*p;
+    p = mat3(1.0,0,0, 0,cos(time),-sin(time), 0,sin(time),cos(time) )*p;
     // p = mat3(cos(time),0,-sin(time), 0,1,0, sin(time),0,cos(time))*p;
     // p = mat3(cos(time),-sin(time),0, sin(time), cos(time),0 ,0,0,1)*p;
     return sdRegularTetrahedron(p);
@@ -88,9 +94,8 @@ vec3 doColor(vec3 p){
     // float e = 0.001;
     // float e = 0.01;
     // float e = 0.1;
-    // float e = 0.5;
-    // float e = 0.1 + 0.9*abs(sin(time));
-    float e = 1.;
+    // float e = 1.;
+    float e = 1.4;
     if (udInstanceTriangle01(p)<e){
         vec3 normal = genNormal(p);
         vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
@@ -104,13 +109,15 @@ vec3 doColor(vec3 p){
         float diff  = max(dot(normal, light), 0.1);
         float spec = pow(diff*diff, 15.0);
         return vec3(diff*0.3+spec, diff+spec, diff+spec);
+        // return vec3(diff+spec, diff*0.3+spec, diff+spec);
     }
     if (udInstanceTriangle03(p)<e){
         vec3 normal = genNormal(p);
         vec3 light  = normalize(vec3(1.0, 1.0, 1.0));
         float diff  = max(dot(normal, light), 0.1);
         float spec = pow(diff*diff, 15.0);
-        return vec3(diff*0.3+spec, diff+spec, diff+spec);
+        return vec3(diff*0.3+spec, diff+spec, diff+spec);        
+        // return vec3(diff+spec, diff+spec, diff*0.3+spec);
     }
     if (udInstanceTriangle04(p)<e){
         vec3 normal = genNormal(p);
@@ -118,8 +125,9 @@ vec3 doColor(vec3 p){
         float diff  = max(dot(normal, light), 1.0);
         float spec = pow(diff*diff, 15.0);
         return vec3(diff*0.3+spec, diff+spec, diff+spec);
+        // return vec3(diff*0.3+spec, diff+spec, diff*0.3+spec);
     }
-    return vec3(0.0);
+    return vec3(0.);
 }
 
 void main(){
@@ -136,11 +144,13 @@ void main(){
     vec3 rPos = cPos;
 
     for(int i = 0; i < 64; ++i){
+    // for(int i = 0; i < 32; ++i){
         dist = distanceHub(rPos);
         rLen += dist;
         rPos = cPos + ray * rLen;
     }
 
     vec3 color = doColor(rPos);
+    // vec3 color = (dist < 0.001)? doColor(rPos) : vec3(1.0, 0.0, 0.0);
     gl_FragColor = vec4(color, 1.0);
 }

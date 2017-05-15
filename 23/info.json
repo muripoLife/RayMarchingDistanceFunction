@@ -1,6 +1,6 @@
 {
-    "title": "Triangle stone distance function",
+    "title": "sigmoid distance function",
     "version": "0.0.1",
     "author": "ogi",
-    "description": "Triangle stone"
+    "description": "シグモイド関数を描画してみる"
 }
